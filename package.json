@@ -5,7 +5,12 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "lint": "eslint --max-warnings 0 \"src/**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit -p .",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "test": "yarn lint && yarn typecheck && yarn format:check"
   },
   "dependencies": {
     "expo": "~37.0.3",
@@ -13,14 +18,27 @@
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-37.0.1.tar.gz",
     "react-native-screens": "~2.2.0",
-    "react-native-web": "~0.11.7"
+    "react-native-web": "~0.11.7",
+    "styled-components": "^5.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",
     "@types/react": "~16.9.23",
     "@types/react-native": "~0.61.17",
+    "@types/styled-components": "^5.1.0",
     "babel-preset-expo": "~8.1.0",
+    "eslint": "^7.2.0",
+    "eslint-config-kodefox": "^0.2.2",
+    "prettier": "^2.0.5",
     "typescript": "~3.8.3"
+  },
+  "eslintConfig": {
+    "extends": "kodefox/react"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "arrowParens": "always"
   },
   "private": true
 }
