@@ -12,6 +12,10 @@ import {
 
 import { View } from '../core/View';
 import Text, { Title } from '../core/Text';
+import {
+  useConfigGenerator,
+  PackageManager,
+} from '../../contexts/configGenerator';
 
 const Wrapper = styled(View)`
   flex: 1;
@@ -37,17 +41,16 @@ const Paper = styled(UnstyledPaper)`
   padding: 20px;
 `;
 
-const PACKAGE_MANAGER = [
+const PACKAGE_MANAGER: ReadonlyArray<{ id: PackageManager; name: string }> = [
   { id: 'yarn', name: 'Yarn' },
   { id: 'npm', name: 'NPM' },
 ] as const;
 
-type PackageManager = typeof PACKAGE_MANAGER[number]['id'];
-
 export default function Generator() {
+  let { config } = useConfigGenerator();
   let [jobName, setJobName] = useState('');
   let [nodeVersion, setNodeVersion] = useState('');
-  let [pkgManager, setPkgManager] = useState<PackageManager>('yarn');
+  let [pkgManager, setPkgManager] = useState<PackageManager>(config.pkgManager);
 
   return (
     <Wrapper>
