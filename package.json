@@ -13,6 +13,7 @@
     "test": "yarn lint && yarn typecheck && yarn format:check"
   },
   "dependencies": {
+    "@material-ui/core": "^4.10.1",
     "expo": "~37.0.3",
     "prism-react-renderer": "^1.1.1",
     "react": "~16.9.0",
