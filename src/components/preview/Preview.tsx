@@ -5,8 +5,6 @@ import theme from 'prism-react-renderer/themes/nightOwl';
 import { Box, Button } from '@material-ui/core';
 import copy from 'copy-to-clipboard';
 
-import { View } from '../core/View';
-import { Title } from '../core/Text';
 import { useConfigGenerator } from '../../contexts/configGenerator';
 
 const Wrapper = styled(Box)`
@@ -61,6 +59,11 @@ jobs:
             - v1-dependencies-{{ checksum "${lockfile}" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
+
+      - run:
+          name: Your step name
+          command: |
+            # Your command here
 
       - save_cache:
           paths:

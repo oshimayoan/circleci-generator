@@ -10,22 +10,16 @@ import {
   Box,
 } from '@material-ui/core';
 
-import { View } from '../core/View';
-import Text, { Title } from '../core/Text';
 import {
   useConfigGenerator,
   PackageManager,
 } from '../../contexts/configGenerator';
 
-const Wrapper = styled(View)``;
-
-const Content = styled(View)``;
-
 const Section = styled(Box)`
   padding: 10px 0;
 `;
 
-const HorizontalView = styled(View)`
+const HorizontalView = styled(Box)`
   flex-direction: row;
 `;
 

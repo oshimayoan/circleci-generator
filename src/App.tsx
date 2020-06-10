@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Box } from '@material-ui/core';
 
 import { ConfigGeneratorProvider } from './contexts/configGenerator';
 import Preview from './components/preview/Preview';
 import Generator from './components/generator/Generator';
-import { View } from './components/core/View';
 
-const Root = styled(View)`
+const Root = styled(Box)`
+  display: flex;
   flex: 1;
   flex-direction: row;
   background-color: white;
