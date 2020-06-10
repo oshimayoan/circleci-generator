@@ -41,7 +41,7 @@ export default function Preview() {
   let lockfile =
     config.pkgManager === 'yarn' ? 'yarn.lock' : 'package-lock.json';
 
-  let generatedConfig = `
+  let generatedSimpleConfig = `
 version: 2.1
 
 jobs:
@@ -74,7 +74,80 @@ workflows:
   main:
     jobs:
       - ${config.jobName}
-`.trim();
+  `.trim();
+
+  let orbname = '${orbname}';
+  let generatedMonorepoConfig = `
+version: 2.1
+
+orbs:
+  compare-url: oshimayoan/compare-url@1.2.4
+
+jobs:
+  ${config.jobName}:
+    docker:
+      - image: circleci/node:${config.nodeVersion}
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - compare-url/reconstruct:
+          project-path: ~/repo
+
+      # Download and cache dependencies
+      # You can change both "projectA" and "projectB" with your own
+      # You can copy it for more
+      - restore_cache:
+          keys:
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-{{ checksum "projectA/${lockfile}" }}
+            - v1-dependencies-
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "projectB/${lockfile}" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - compare-url/use:
+          step-name: Your step name
+          custom-logic: |
+            for ORB in ./*/; do
+              orbname=$(basename $ORB)
+              if [[ $(git diff $COMMIT_RANGE --name-status | grep "$orbname") ]]; then
+                echo "testing ${orbname}"
+                cd ${orbname}
+                # Do what you want here
+                # Maybe testing, such as:
+                # yarn install --frozen-lockfile
+                # yarn test --maxWorkers=4
+                cd ..
+              else
+                echo "${orbname} not modified; no need to test"
+              fi
+            done
+
+      # You can copy it for more
+      - save_cache:
+          paths:
+            - projectA/node_modules
+          key: v1-dependencies-{{ checksum "projectA/${lockfile}" }}
+
+      - save_cache:
+          paths:
+            - projectB/node_modules
+          key: v1-dependencies-{{ checksum "projectB/${lockfile}" }}
+
+workflows:
+  main:
+    jobs:
+      - ${config.jobName}
+  `.trim();
+
+  let generatedConfig = config.isMonorepo
+    ? generatedMonorepoConfig
+    : generatedSimpleConfig;
 
   let copyToClipboard = () => {
     copy(generatedConfig);
