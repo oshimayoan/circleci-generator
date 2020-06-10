@@ -2,13 +2,16 @@ import React from 'react';
 import styled from 'styled-components';
 import Highlight, { defaultProps } from 'prism-react-renderer';
 import theme from 'prism-react-renderer/themes/nightOwl';
+import { Box, Button } from '@material-ui/core';
+import copy from 'copy-to-clipboard';
 
 import { View } from '../core/View';
 import { Title } from '../core/Text';
+import { useConfigGenerator } from '../../contexts/configGenerator';
 
-const Wrapper = styled(View)`
+const Wrapper = styled(Box)`
   flex: 1;
-  padding: 15px;
+  margin-left: 15px;
 `;
 
 const Pre = styled.pre`
@@ -32,30 +35,57 @@ const LineNo = styled.span`
 
 const LineContent = styled.span`
   display: table-cell;
+  padding: 2px 0;
 `;
 
-const exampleCode = `
+export default function Preview() {
+  let { config } = useConfigGenerator();
+  let lockfile =
+    config.pkgManager === 'yarn' ? 'yarn.lock' : 'package-lock.json';
+
+  let generatedConfig = `
 version: 2.1
 
-orbs:
-  compare-url: oshimayoan/compare-url@1.2.4
-  cypress: cypress-io/cypress@1
-
 jobs:
-  test:
+  ${config.jobName}:
     docker:
-      - image: circleci/node:lts
-      - image: circleci/postgres:9.6.5-alpine-ram
+      - image: circleci/node:${config.nodeVersion}
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "${lockfile}" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - save_cache:
+          paths:
+            - ./node_modules
+          key: v1-dependencies-{{ checksum "${lockfile}" }}
+
+workflows:
+  main:
+    jobs:
+      - ${config.jobName}
 `.trim();
 
-export default function Preview() {
+  let copyToClipboard = () => {
+    copy(generatedConfig);
+  };
+
   return (
     <Wrapper>
-      <Title>Preview</Title>
+      <Button variant="contained" onClick={copyToClipboard}>
+        Copy to clipboard
+      </Button>
       <Highlight
         {...defaultProps}
         theme={theme}
-        code={exampleCode}
+        code={generatedConfig}
         language="yaml"
       >
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
